@@ -12,6 +12,7 @@ interface Props
 {
     onAddShape:(type:string) => void,
     removeShape : () => void,
+    enableSnapping:() => void,
     menu : Menu[]
 }
  
@@ -28,7 +29,12 @@ class Toolbar extends React.Component<Props, State>
     protected renderMenu = (menu:Menu, index:number) =>
     {
         let eventClick = menu.type == 'remove' ? () => this.props.removeShape() : () => this.props.onAddShape(menu.type);
-        
+
+        if(menu.type == 'snapping')
+        {
+            eventClick = () => this.props.enableSnapping();
+        }
+
         return(
             <li className="nav-item" key={index}>
                 <a className="nav-link" href="#" onClick={eventClick}>

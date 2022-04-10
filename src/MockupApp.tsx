@@ -6,6 +6,7 @@ interface State
 {
     shapes : ShapeData [],
     shapeSelected : ShapeData | undefined;
+    moveShape: boolean
 }
 interface Props { }
 
@@ -16,6 +17,7 @@ class MockupApp extends React.Component<Props, State>
         super(props);
         this.state = {
             shapeSelected : undefined,
+            moveShape : false,
             shapes :
             [          
                 {index:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
@@ -23,9 +25,14 @@ class MockupApp extends React.Component<Props, State>
         };
     }
 
-    public selectShape = (shape:ShapeData) =>
+    public selectShape = (shape:ShapeData | undefined) =>
     {
         this.setState({shapeSelected : shape});
+    }
+
+    public onMoveShape = (move:boolean) =>
+    {
+        this.setState({moveShape : move});
     }
 
     public addShape = (type:string) =>
@@ -51,8 +58,8 @@ class MockupApp extends React.Component<Props, State>
         [
             {name : 'Create Rect', type:'rect', iconFontAwesome:'fa-square'},
             {name : 'Create Circle', type:'circle', iconFontAwesome:'fa-circle'},
+            {name : 'Create Slash', type:'line', iconFontAwesome:'fa-slash'},
             {name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height'},
-            {name : 'Create Draw', type:'path', iconFontAwesome:'fa-pencil'},
             {name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can'},
             {
                 name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', subMenu:
@@ -60,7 +67,8 @@ class MockupApp extends React.Component<Props, State>
                     {name : 'Fill Color', type:'color', iconFontAwesome:'fa-palette'},
                     {name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
                 ]
-            }
+            },
+            {name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-magnet'},
         ];
         
         return (
@@ -68,12 +76,15 @@ class MockupApp extends React.Component<Props, State>
             <ContainerSVG
                 shapes={this.state.shapes}
                 shapeSelected={this.state.shapeSelected}
+                moveShape={this.state.moveShape}
                 onAddShape={e=>e}
-                onSelectShape={this.selectShape}/>
+                onSelectShape={this.selectShape}
+                onMoveShape={this.onMoveShape}/>
             <Toolbar
                 menu={menu}
                 onAddShape={this.addShape}
-                removeShape={this.removeShapeSelected}/>
+                removeShape={this.removeShapeSelected}
+                enableSnapping={()=>''}/>
         </div>);
     }
 }

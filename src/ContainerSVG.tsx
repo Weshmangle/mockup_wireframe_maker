@@ -1,17 +1,19 @@
 import React, { Children } from 'react';
 import './App.css';
+import Gizmos from './Gizmos';
 
 interface Props
 {
   shapes:ShapeData[],
-  shapeSelected:ShapeData | undefined
+  shapeSelected:ShapeData | undefined,
+  moveShape:boolean,
   onAddShape:(type:string) => void,
-  onSelectShape:(shape:ShapeData) => void,
+  onSelectShape:(shape:ShapeData | undefined) => void,
+  onMoveShape:(move:boolean)=>void
 }
 
 interface State
 {
-  shapeSelected : ShapeData | undefined;
   offset : {x:number, y:number}
 }
 
@@ -30,13 +32,13 @@ export interface ShapeData
 class ContainerSVG extends React.Component<Props, State>
 {
   protected step:number = 1;
+  
   constructor(props:any)
   {
     super(props);
 
     this.state =
     {
-      shapeSelected : undefined,
       offset : {x:0, y:0}
     };
   }
@@ -64,26 +66,24 @@ class ContainerSVG extends React.Component<Props, State>
     {
       state.offset = { x : offset.x - state.shapeSelected.x, y : offset.y - state.shapeSelected.y};
     }
-    if(state.shapeSelected)
-    {
-      this.props.onSelectShape(state.shapeSelected);
-    }
-    //this.setState(state);
+
+    this.props.onSelectShape(state.shapeSelected);
+    this.props.onMoveShape(true);
   }
 
   protected drag = (event:React.MouseEvent) =>
   {
-    if(!this.state.shapeSelected ) return;
+    if(!this.props.shapeSelected || !this.props.moveShape) return;
     
     event.preventDefault();
     
-    let shape = this.state.shapeSelected;
+    let shape = this.props.shapeSelected;
 
     let coord = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
 
     if(coord)
     {
-      let snapFactor = 10;
+      let snapFactor = 100;
 
       shape.x = coord.x - this.state.offset.x;
       shape.y = coord.y - this.state.offset.y;
@@ -91,14 +91,13 @@ class ContainerSVG extends React.Component<Props, State>
       shape.x = Math.floor((coord.x - this.state.offset.x)/snapFactor) * snapFactor;
       shape.y = Math.floor((coord.y - this.state.offset.y)/snapFactor) * snapFactor;
     }
-
-    //shape.data
     
     this.setState({});
   }
   protected endDrag = (event:React.MouseEvent) =>
   {
-    this.setState({shapeSelected : undefined});
+    this.props.onMoveShape(false);
+    //this.props.onSelectShape(undefined);
   }
 
   protected renderShape = (shape:ShapeData, index:number) =>
@@ -109,6 +108,7 @@ class ContainerSVG extends React.Component<Props, State>
     {
       case 'rect':
         return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
+          <Gizmos/>
           <rect x={shape.x} y={shape.y} width={shape.width} height={shape.height} fill={shape.fill}/>
           </g>
       case 'circle':
@@ -121,13 +121,14 @@ class ContainerSVG extends React.Component<Props, State>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry.
           </text>
           </g>;
+      case 'line':
+        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
+          <line x1={shape.x} y1={shape.y} x2={shape.x+shape.width} y2={shape.y+shape.height} fill={shape.fill} strokeWidth='2' stroke='red'/>
+          </g>;
       case 'path':
         //<path d="M 0 0 l 50 50" stroke="red"stroke-width="3" fill="none" />
         return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <path x={shape.x} y={shape.y} fill={shape.fill} d={''}>
-            
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-          </path>
+          <path x={shape.x} y={shape.y} fill={shape.fill} d={'M 0 0' + shape.data}/>
           </g>;
       default:
         throw new Error("[ CORE ] ERROR : shape not exist");
