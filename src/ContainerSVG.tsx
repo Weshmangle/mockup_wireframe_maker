@@ -19,7 +19,7 @@ interface State
 
 export interface ShapeData
 {
-  index:number
+  id:number
   x:number,
   y:number,
   width:number,
@@ -108,34 +108,36 @@ class ContainerSVG extends React.Component<Props, State>
   {
     let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
     
+    let visible = this.props.shapeSelected?.id == shape.id;
+
+    let shapeSVG;
+
     switch(shape.type)
     {
       case 'rect':
-        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <rect x={shape.x} y={shape.y} width={shape.width} height={shape.height} fill={shape.fill}/>
-          </g>
+        shapeSVG = <rect x={-shape.width/2} y={-shape.height/2} width={shape.width} height={shape.height} fill={shape.fill}/>;
+        break;
       case 'circle':
-        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <circle cx={shape.x} cy={shape.y} r={(shape.width + shape.height) / 4} fill={shape.fill}/>
-          </g>;
+        shapeSVG = <circle r={(shape.width + shape.height) / 4} fill={shape.fill}/>
+        break;
       case 'text':
-        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <text x={shape.x} y={shape.y} fill={shape.fill}>
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-          </text>
-          </g>;
+        shapeSVG = <text fill={shape.fill}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </text>
+        break;
       case 'line':
-        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <line x1={shape.x} y1={shape.y} x2={shape.x+shape.width} y2={shape.y+shape.height} fill={shape.fill} strokeWidth='2' stroke='red'/>
-          </g>;
+        shapeSVG = <line x1={shape.x} y1={shape.y} x2={shape.x+shape.width} y2={shape.y+shape.height} fill={shape.fill} strokeWidth='2' stroke='red'/>
+        break;
       case 'path':
-        //<path d="M 0 0 l 50 50" stroke="red"stroke-width="3" fill="none" />
-        return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <path x={shape.x} y={shape.y} fill={shape.fill} d={'M 0 0' + shape.data}/>
-          </g>;
+        shapeSVG = <path fill={shape.fill} d={'M 0 0' + shape.data}/>
+        break;
       default:
         throw new Error("[ CORE ] ERROR : shape not exist");
     }
+
+    return (
+      <g transform={`translate(${shape.x} ${shape.y})`} key={shape.id} shape-id={shape.id} cursor={'pointer'}>
+        {shapeSVG}
+        <Gizmos width={shape.width} height={shape.height} visible={visible}/>
+      </g>);
   }
 
   public render()

@@ -23,7 +23,7 @@ class MockupApp extends React.Component<Props, State>
             moveShape : false,
             shapes :
             [          
-                {index:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
+                {id:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
             ],
             snapGrid : false,
             color : undefined
@@ -42,8 +42,9 @@ class MockupApp extends React.Component<Props, State>
 
     public addShape = (type:string) =>
     {
-        let last = this.state.shapes[this.state.shapes.length - 1];
-        let shape:ShapeData = {index:this.state.shapes.length, x:last.x + 25, y:last.x + 25, width:50, height:50, type: type, fill:'#ff5555'};
+        let last:any = this.state.shapes[this.state.shapes.length - 1];
+        last = last == undefined ? {x:0, y:0} : last;
+        let shape:ShapeData = {id:this.state.shapes.length, x:last.x + 25, y:last.x + 25, width:50, height:50, type: type, fill:'#ff5555'};
         this.state.shapes.push(shape);
         this.setState({});
     }
@@ -55,10 +56,14 @@ class MockupApp extends React.Component<Props, State>
 
     public removeShapeSelected = () =>
     {
-        if(this.state.shapeSelected?.index != undefined)
+        let shapes = this.state.shapes;
+        let shape = this.state.shapeSelected;
+        
+        if(shape != undefined)
         {
-            delete this.state.shapes[this.state.shapeSelected?.index];
-            this.setState({});
+            let newShapes = shapes.filter(menu => menu.id != shape?.id);
+            
+            this.setState({shapeSelected : newShapes[newShapes.length - 1], shapes : newShapes});
         }
     }
 
