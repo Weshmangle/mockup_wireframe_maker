@@ -9,7 +9,8 @@ interface State
     shapeSelected : ShapeData | undefined;
     moveShape: boolean,
     snapGrid:boolean,
-    color:any
+    color:any,
+    showPickerColor:boolean
 }
 interface Props { }
 
@@ -26,7 +27,8 @@ class MockupApp extends React.Component<Props, State>
                 {id:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
             ],
             snapGrid : false,
-            color : undefined
+            color : undefined,
+            showPickerColor : false
         };
     }
 
@@ -77,6 +79,11 @@ class MockupApp extends React.Component<Props, State>
         this.setState({color : color});
     }
 
+    protected showPickerColor = () =>
+    {
+        this.setState({showPickerColor : !this.state.showPickerColor})
+    }
+
     public render()
     {
         let menu:Menu[] = 
@@ -87,7 +94,7 @@ class MockupApp extends React.Component<Props, State>
             {id:'3', name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height', event : this.addShape},
             {id:'4', name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can', event : this.removeShapeSelected},
             {
-                id:'5', name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', subMenu:
+                id:'5', name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', event: () => this.showPickerColor(), subMenu:
                 [
                     {id:'5.1', name : 'Fill Color', type:'color', iconFontAwesome:'fa-palette'},
                     {id:'5.2', name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
@@ -98,7 +105,7 @@ class MockupApp extends React.Component<Props, State>
         
         return (
         <div>
-            <div style={{position : 'absolute', right:'0'}}>
+            <div style={{position : 'absolute', right:'0', visibility:this.state.showPickerColor ? 'visible' : 'hidden'}}>
                 <SketchPicker onChange={(color:any) => this.setState({color : color.hex})} onChangeComplete={this.setColorShapeSelected} color={this.state.color}/>
             </div>
             <ContainerSVG
