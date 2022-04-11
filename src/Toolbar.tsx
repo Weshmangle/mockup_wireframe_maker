@@ -2,43 +2,72 @@ import React from "react";
 
 export interface Menu
 {
+    id:string,
     name: string,
     type:string,
     iconFontAwesome?:string,
-    subMenu?:Menu[]
+    toggle?:boolean,
+    subMenu?:Menu[],
+    event? : (type:string) => void
 }
 
 interface Props
 {
-    onAddShape:(type:string) => void,
-    removeShape : () => void,
-    enableSnapping:() => void,
     menu : Menu[]
 }
  
-interface State { }
+interface State
+{
+    menuActivate : Menu[]
+}
 
 class Toolbar extends React.Component<Props, State>
 {
     constructor(props: Props)
     {
         super(props);
-        this.state = {};
+        this.state = { menuActivate : []};
+    }
+
+    protected menuIsActivate(menu:Menu)
+    {
+        let menuFinded = this.state.menuActivate.find(m => m.id == menu.id)
+        return menuFinded != undefined;
+    }
+
+    public clickMenu(menu:Menu)
+    {
+        let event = menu.event ? menu.event : (type:string) => {console.error("[ CORE ] NO EVENT ADDED")};
+        
+        let iconType = 'solid';
+
+        if(menu.toggle)
+        {
+            let index = Number(menu.id);
+
+            if(index >= 0)
+            {
+                iconType = 'solid';
+                delete this.state.menuActivate[index];
+            }
+            else
+            {
+                iconType = 'regular';
+                this.state.menuActivate.push(menu);   
+            }
+        }
+
+        event(menu.type);
     }
 
     protected renderMenu = (menu:Menu, index:number) =>
     {
-        let eventClick = menu.type == 'remove' ? () => this.props.removeShape() : () => this.props.onAddShape(menu.type);
-
-        if(menu.type == 'snapping')
-        {
-            eventClick = () => this.props.enableSnapping();
-        }
-
+        let iconType = this.menuIsActivate(menu) ? 'regular' : 'solid';
+        
         return(
             <li className="nav-item" key={index}>
-                <a className="nav-link" href="#" onClick={eventClick}>
-                    <i className={`fa-solid ${menu.iconFontAwesome}`} style={{fontSize : '2em'}}></i>
+                <a className="nav-link" href="#" onClick={e => this.clickMenu(menu)}>
+                    <i className={`fa-${iconType} ${menu.iconFontAwesome}`} style={{fontSize : '2em'}}></i>
                 </a>
             </li>
         );

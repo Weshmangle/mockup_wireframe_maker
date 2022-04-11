@@ -1,12 +1,15 @@
 import React from "react";
 import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
+import { SketchPicker, ColorResult, ColorChangeHandler } from 'react-color';
 
 interface State
 {
     shapes : ShapeData [],
     shapeSelected : ShapeData | undefined;
-    moveShape: boolean
+    moveShape: boolean,
+    snapGrid:boolean,
+    color:any
 }
 interface Props { }
 
@@ -21,7 +24,9 @@ class MockupApp extends React.Component<Props, State>
             shapes :
             [          
                 {index:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
-            ]
+            ],
+            snapGrid : false,
+            color : undefined
         };
     }
 
@@ -43,6 +48,11 @@ class MockupApp extends React.Component<Props, State>
         this.setState({});
     }
 
+    public addSnapping = (type:string) =>
+    {
+        this.setState({snapGrid : !this.state.snapGrid});
+    }
+
     public removeShapeSelected = () =>
     {
         if(this.state.shapeSelected?.index != undefined)
@@ -52,39 +62,48 @@ class MockupApp extends React.Component<Props, State>
         }
     }
 
+    public setColorShapeSelected = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) =>
+    {
+        if(this.state.shapeSelected != undefined)
+        {
+            this.state.shapeSelected.fill = color.hex;
+        }
+
+        this.setState({color : color});
+    }
+
     public render()
     {
         let menu:Menu[] = 
         [
-            {name : 'Create Rect', type:'rect', iconFontAwesome:'fa-square'},
-            {name : 'Create Circle', type:'circle', iconFontAwesome:'fa-circle'},
-            {name : 'Create Slash', type:'line', iconFontAwesome:'fa-slash'},
-            {name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height'},
-            {name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can'},
+            {id:'0', name : 'Create Rect', type:'rect', iconFontAwesome:'fa-square', event : this.addShape},
+            {id:'1', name : 'Create Circle', type:'circle', iconFontAwesome:'fa-circle', event : this.addShape},
+            //{id:'2', name : 'Create Slash', type:'line', iconFontAwesome:'fa-slash', event : this.addShape},
+            {id:'3', name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height', event : this.addShape},
+            {id:'4', name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can', event : this.removeShapeSelected},
             {
-                name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', subMenu:
+                id:'5', name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', subMenu:
                 [
-                    {name : 'Fill Color', type:'color', iconFontAwesome:'fa-palette'},
-                    {name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
+                    {id:'5.1', name : 'Fill Color', type:'color', iconFontAwesome:'fa-palette'},
+                    {id:'5.2', name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
                 ]
             },
-            {name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-magnet'},
+            //{id:'6', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-magnet', toggle : true, event : this.addSnapping},
         ];
         
         return (
         <div>
+            <div style={{position : 'absolute', right:'0'}}>
+                <SketchPicker onChange={(color:any) => this.setState({color : color.hex})} onChangeComplete={this.setColorShapeSelected} color={this.state.color}/>
+            </div>
             <ContainerSVG
                 shapes={this.state.shapes}
                 shapeSelected={this.state.shapeSelected}
                 moveShape={this.state.moveShape}
-                onAddShape={e=>e}
+                snapGrid={this.state.snapGrid}
                 onSelectShape={this.selectShape}
                 onMoveShape={this.onMoveShape}/>
-            <Toolbar
-                menu={menu}
-                onAddShape={this.addShape}
-                removeShape={this.removeShapeSelected}
-                enableSnapping={()=>''}/>
+            <Toolbar menu={menu}/>
         </div>);
     }
 }

@@ -7,7 +7,7 @@ interface Props
   shapes:ShapeData[],
   shapeSelected:ShapeData | undefined,
   moveShape:boolean,
-  onAddShape:(type:string) => void,
+  snapGrid:boolean,
   onSelectShape:(shape:ShapeData | undefined) => void,
   onMoveShape:(move:boolean)=>void
 }
@@ -83,13 +83,17 @@ class ContainerSVG extends React.Component<Props, State>
 
     if(coord)
     {
-      let snapFactor = 100;
-
-      shape.x = coord.x - this.state.offset.x;
-      shape.y = coord.y - this.state.offset.y;
-
-      shape.x = Math.floor((coord.x - this.state.offset.x)/snapFactor) * snapFactor;
-      shape.y = Math.floor((coord.y - this.state.offset.y)/snapFactor) * snapFactor;
+      if(this.props.snapGrid)
+      {
+        let snapFactor = 100;  
+        shape.x = Math.floor((coord.x - this.state.offset.x)/snapFactor) * snapFactor;
+        shape.y = Math.floor((coord.y - this.state.offset.y)/snapFactor) * snapFactor;
+      }
+      else
+      {
+        shape.x = coord.x - this.state.offset.x;
+        shape.y = coord.y - this.state.offset.y;
+      }
     }
     
     this.setState({});
@@ -108,7 +112,6 @@ class ContainerSVG extends React.Component<Props, State>
     {
       case 'rect':
         return <g {...stroke} key={shape.index} shape-id={shape.index} cursor={'pointer'}>
-          <Gizmos/>
           <rect x={shape.x} y={shape.y} width={shape.width} height={shape.height} fill={shape.fill}/>
           </g>
       case 'circle':
