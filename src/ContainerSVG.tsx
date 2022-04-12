@@ -9,7 +9,8 @@ interface Props
   moveShape:boolean,
   snapGrid:boolean,
   onSelectShape:(shape:ShapeData | undefined) => void,
-  onMoveShape:(move:boolean)=>void
+  onMoveShape:(move:boolean)=>void,
+  onResize?:(resize:{width:number, height:number})=>void
 }
 
 interface State
@@ -56,19 +57,34 @@ class ContainerSVG extends React.Component<Props, State>
     return id ? this.props.shapes[Number(id)] : undefined;
   }
 
+  protected isGizmo(event:React.MouseEvent)
+  {
+    let idGizmo = (event.target as SVGElement)?.getAttribute('id-gizmo');
+    let control = idGizmo?.split(',');
+    return control && control.length == 2 ? {x:Number(control[0]), y:Number(control[1])} : undefined;
+  }
+
   protected startDrag = (event:React.MouseEvent) =>
   {
-    let state = {shapeSelected : this.getShape(event), offset : this.state.offset};
-    
-    let offset = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
-    
-    if(offset && state.shapeSelected)
+    let gizmo = this.isGizmo(event);
+    if(gizmo)
     {
-      state.offset = { x : offset.x - state.shapeSelected.x, y : offset.y - state.shapeSelected.y};
+      console.log("gizmo", gizmo);
     }
-
-    this.props.onSelectShape(state.shapeSelected);
-    this.props.onMoveShape(true);
+    else
+    {
+      let state = {shapeSelected : this.getShape(event), offset : this.state.offset};
+      
+      let offset = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
+      
+      if(offset && state.shapeSelected)
+      {
+        state.offset = { x : offset.x - state.shapeSelected.x, y : offset.y - state.shapeSelected.y};
+      }
+      
+      this.props.onSelectShape(state.shapeSelected);
+      this.props.onMoveShape(true);
+    }
   }
 
   protected drag = (event:React.MouseEvent) =>
@@ -98,10 +114,10 @@ class ContainerSVG extends React.Component<Props, State>
     
     this.setState({});
   }
+  
   protected endDrag = (event:React.MouseEvent) =>
   {
     this.props.onMoveShape(false);
-    //this.props.onSelectShape(undefined);
   }
 
   protected renderShape = (shape:ShapeData, index:number) =>

@@ -2,6 +2,7 @@ import React from "react";
 import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
 import { SketchPicker, ColorResult, ColorChangeHandler } from 'react-color';
+import { EStateEditor } from "./EStateEditor";
 
 interface State
 {
@@ -10,6 +11,7 @@ interface State
     moveShape: boolean,
     snapGrid:boolean,
     color:any,
+    stateEditor:EStateEditor,
     showPickerColor:boolean
 }
 interface Props { }
@@ -28,8 +30,14 @@ class MockupApp extends React.Component<Props, State>
             ],
             snapGrid : false,
             color : undefined,
+            stateEditor : EStateEditor.NONE,
             showPickerColor : false
         };
+    }
+
+    protected lastShape() : ShapeData | undefined
+    {
+        return this.state.shapes[this.state.shapes.length -1];
     }
 
     public selectShape = (shape:ShapeData | undefined) =>
@@ -44,9 +52,10 @@ class MockupApp extends React.Component<Props, State>
 
     public addShape = (type:string) =>
     {
-        let last:any = this.state.shapes[this.state.shapes.length - 1];
-        last = last == undefined ? {x:0, y:0} : last;
-        let shape:ShapeData = {id:this.state.shapes.length, x:last.x + 25, y:last.x + 25, width:50, height:50, type: type, fill:'#ff5555'};
+        let shapeFocus:any = this.state.shapeSelected;
+        shapeFocus = shapeFocus ? shapeFocus : this.lastShape();
+        shapeFocus = shapeFocus ? shapeFocus : {x:0, y:0};
+        let shape:ShapeData = {id:this.state.shapes.length, x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#ff5555'};
         this.state.shapes.push(shape);
         this.setState({});
     }
