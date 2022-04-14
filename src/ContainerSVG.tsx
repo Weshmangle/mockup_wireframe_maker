@@ -187,7 +187,7 @@ class ContainerSVG extends React.Component<Props, State>
     return (
       <g transform={`translate(${shape.x} ${shape.y})`} key={shape.id} shape-id={shape.id} cursor={'pointer'}>
         {shapeSVG}
-        <Gizmos width={shape.width} height={shape.height} visible={visible}/>
+        {visible ? <Gizmos width={shape.width} height={shape.height}/> : undefined}
       </g>);
   }
 

@@ -48,8 +48,7 @@ class Toolbar extends React.Component<Props, State>
             if(menus.length > 0)
             {
                 iconType = 'regular';
-                let menusActivate = this.state.menuActivate.filter(menuItem => menuItem.id != menu.id);
-                this.setState({menuActivate : menusActivate});
+                this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id != menu.id)});
             }
             else
             {

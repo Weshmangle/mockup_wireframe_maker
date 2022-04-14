@@ -3,8 +3,7 @@ import React from "react";
 interface Props
 {
     width:number,
-    height:number,
-    visible:boolean
+    height:number
 }
  
 interface State
@@ -35,10 +34,8 @@ class Gizmos extends React.Component<Props, State>
     
     public render()
     {
-        let visible:any = this.props.visible ? 'visible' : 'hidden';
-
         return (
-            <g style={{visibility : visible}}> {this.state.gizmos.map(this.renderGizmos)} </g>
+            <g> {this.state.gizmos.map(this.renderGizmos)} </g>
         );
     }
 }
