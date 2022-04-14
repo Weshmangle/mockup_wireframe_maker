@@ -39,20 +39,21 @@ class Toolbar extends React.Component<Props, State>
     {
         let event = menu.event ? menu.event : (type:string) => {console.error("[ CORE ] NO EVENT ADDED")};
         
-        let iconType = 'solid';
+        let iconType = 'regular';
 
         if(menu.toggle)
         {
-            let index = Number(menu.id);
+            let menus = this.state.menuActivate.filter(menuItem => menuItem.id == menu.id);
 
-            if(index >= 0)
+            if(menus.length > 0)
             {
-                iconType = 'solid';
-                delete this.state.menuActivate[index];
+                iconType = 'regular';
+                let menusActivate = this.state.menuActivate.filter(menuItem => menuItem.id != menu.id);
+                this.setState({menuActivate : menusActivate});
             }
             else
             {
-                iconType = 'regular';
+                iconType = 'solid';
                 this.state.menuActivate.push(menu);   
             }
         }

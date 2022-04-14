@@ -11,7 +11,6 @@ interface State
     moveShape: boolean,
     snapGrid:boolean,
     color:any,
-    stateEditor:EStateEditor,
     showPickerColor:boolean
 }
 interface Props { }
@@ -26,11 +25,10 @@ class MockupApp extends React.Component<Props, State>
             moveShape : false,
             shapes :
             [          
-                {id:0, x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
+                {id:Date.now(), x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
             ],
             snapGrid : false,
             color : undefined,
-            stateEditor : EStateEditor.NONE,
             showPickerColor : false
         };
     }
@@ -55,9 +53,9 @@ class MockupApp extends React.Component<Props, State>
         let shapeFocus:any = this.state.shapeSelected;
         shapeFocus = shapeFocus ? shapeFocus : this.lastShape();
         shapeFocus = shapeFocus ? shapeFocus : {x:0, y:0};
-        let shape:ShapeData = {id:this.state.shapes.length, x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#ff5555'};
+        let shape:ShapeData = {id:Date.now(), x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#ff5555'};
         this.state.shapes.push(shape);
-        this.setState({});
+        this.setState({shapeSelected : shape});
     }
 
     public addSnapping = (type:string) =>
@@ -75,6 +73,16 @@ class MockupApp extends React.Component<Props, State>
             let newShapes = shapes.filter(menu => menu.id != shape?.id);
             
             this.setState({shapeSelected : newShapes[newShapes.length - 1], shapes : newShapes});
+        }
+    }
+
+    public rizeShape(resize:{width:number, height:number})
+    {
+        if(this.state.shapeSelected)
+        {
+            let shape = this.state.shapeSelected;
+            shape.width = resize.width;
+            shape.height = resize.height;
         }
     }
 
@@ -109,7 +117,7 @@ class MockupApp extends React.Component<Props, State>
                     {id:'5.2', name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
                 ]
             },
-            //{id:'6', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-magnet', toggle : true, event : this.addSnapping},
+            {id:'6', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-compass', toggle : true, event : this.addSnapping},
         ];
         
         return (
@@ -120,10 +128,16 @@ class MockupApp extends React.Component<Props, State>
             <ContainerSVG
                 shapes={this.state.shapes}
                 shapeSelected={this.state.shapeSelected}
-                moveShape={this.state.moveShape}
+                //moveShape={this.state.moveShape}
                 snapGrid={this.state.snapGrid}
                 onSelectShape={this.selectShape}
-                onMoveShape={this.onMoveShape}/>
+                onResize={e => {
+                    if(this.state.shapeSelected)
+                    {
+                        this.state.shapeSelected.height = Math.abs(e.height);
+                        this.state.shapeSelected.width = Math.abs(e.width);
+                    }
+                }}/>
             <Toolbar menu={menu}/>
         </div>);
     }

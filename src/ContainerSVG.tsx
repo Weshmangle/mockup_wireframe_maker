@@ -1,21 +1,24 @@
 import React, { Children } from 'react';
 import './App.css';
+import { EStateEditor } from './EStateEditor';
 import Gizmos from './Gizmos';
 
 interface Props
 {
   shapes:ShapeData[],
   shapeSelected:ShapeData | undefined,
-  moveShape:boolean,
   snapGrid:boolean,
   onSelectShape:(shape:ShapeData | undefined) => void,
-  onMoveShape:(move:boolean)=>void,
-  onResize?:(resize:{width:number, height:number})=>void
+  onResize:(resize:{width:number, height:number})=>void
 }
 
 interface State
 {
   offset : {x:number, y:number}
+  stateEditor:EStateEditor,
+  moveShape:boolean,
+  gizmoSelected:any,
+  shapeSelected:ShapeData | undefined
 }
 
 export interface ShapeData
@@ -40,7 +43,11 @@ class ContainerSVG extends React.Component<Props, State>
 
     this.state =
     {
-      offset : {x:0, y:0}
+      offset : {x:0, y:0},
+      stateEditor : EStateEditor.RESIZE,
+      moveShape : true,
+      gizmoSelected:undefined,
+      shapeSelected : undefined
     };
   }
 
@@ -53,8 +60,8 @@ class ContainerSVG extends React.Component<Props, State>
   protected getShape(event:React.MouseEvent) : ShapeData | undefined
   {
     let id = ((event.target as SVGElement)?.parentNode as SVGElement)?.getAttribute('shape-id');
-    
-    return id ? this.props.shapes[Number(id)] : undefined;
+    let shapes = this.props.shapes.filter(shape => shape.id == Number(id));
+    return id ? shapes[0] : undefined;
   }
 
   protected isGizmo(event:React.MouseEvent)
@@ -66,35 +73,51 @@ class ContainerSVG extends React.Component<Props, State>
 
   protected startDrag = (event:React.MouseEvent) =>
   {
+    let offset = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
+
     let gizmo = this.isGizmo(event);
+
     if(gizmo)
     {
-      console.log("gizmo", gizmo);
+      this.setState({gizmoSelected : gizmo, moveShape : true, stateEditor : EStateEditor.RESIZE, shapeSelected :  Object.assign({}, this.props.shapeSelected)});
     }
     else
     {
-      let state = {shapeSelected : this.getShape(event), offset : this.state.offset};
-      
-      let offset = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
+      let state = {shapeSelected : this.getShape(event), offset : {x:0, y:0}};
       
       if(offset && state.shapeSelected)
       {
         state.offset = { x : offset.x - state.shapeSelected.x, y : offset.y - state.shapeSelected.y};
+        
+        this.setState({stateEditor : EStateEditor.MOVE, moveShape : true, offset : state.offset});
       }
       
       this.props.onSelectShape(state.shapeSelected);
-      this.props.onMoveShape(true);
     }
   }
 
   protected drag = (event:React.MouseEvent) =>
   {
-    if(!this.props.shapeSelected || !this.props.moveShape) return;
+    if(!this.props.shapeSelected || !this.state.moveShape) return;
     
     event.preventDefault();
-    
-    let shape = this.props.shapeSelected;
 
+    switch (this.state.stateEditor)
+    {
+      case EStateEditor.MOVE:
+        this.moveShape(event, this.props.shapeSelected);
+        break;
+    
+      case EStateEditor.RESIZE:
+        this.resizeShape(event);
+        break;
+    }
+    
+    this.setState({});
+  }
+
+  protected moveShape(event:any, shape:ShapeData)
+  {
     let coord = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
 
     if(coord)
@@ -111,13 +134,25 @@ class ContainerSVG extends React.Component<Props, State>
         shape.y = coord.y - this.state.offset.y;
       }
     }
+  }
+
+  protected resizeShape(event:any)
+  {
+    let coord = this.getMousePosition(event, event.currentTarget as SVGSVGElement);
     
-    this.setState({});
+    if(coord && this.props.shapeSelected)
+    {
+      let position = {x: coord.x - this.state.offset.x, y: coord.y - this.state.offset.y};
+
+      let currentShape = this.state.shapeSelected;
+      if(currentShape)
+        this.props.onResize({width:currentShape?.width + (position.x - this.props.shapeSelected.x)*this.state.gizmoSelected.x, height: currentShape.height + (position.y - this.props.shapeSelected.y)**this.state.gizmoSelected.y})
+    } 
   }
   
   protected endDrag = (event:React.MouseEvent) =>
   {
-    this.props.onMoveShape(false);
+    this.setState({moveShape : false});
   }
 
   protected renderShape = (shape:ShapeData, index:number) =>
@@ -163,6 +198,7 @@ class ContainerSVG extends React.Component<Props, State>
       onMouseDown={this.startDrag}
       onMouseMove={this.drag}
       onMouseUp={this.endDrag}
+      onMouseLeave={this.endDrag}
       width={'100vw'} height={'100vh'}>
         { this.props.children }
         { this.props.shapes.map(this.renderShape) }
