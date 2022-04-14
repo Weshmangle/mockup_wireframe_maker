@@ -3,6 +3,7 @@ import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
 import { SketchPicker, ColorResult, ColorChangeHandler } from 'react-color';
 import { EStateEditor } from "./EStateEditor";
+import GridSnapping from "./GridSnapping";
 
 interface State
 {

@@ -2,6 +2,7 @@ import React, { Children } from 'react';
 import './App.css';
 import { EStateEditor } from './EStateEditor';
 import Gizmos from './Gizmos';
+import GridSnapping from './GridSnapping';
 
 interface Props
 {
@@ -18,7 +19,8 @@ interface State
   stateEditor:EStateEditor,
   moveShape:boolean,
   gizmoSelected:any,
-  shapeSelected:ShapeData | undefined
+  shapeSelected:ShapeData | undefined,
+  sizeViewport:{width:number, height:number}
 }
 
 export interface ShapeData
@@ -47,7 +49,8 @@ class ContainerSVG extends React.Component<Props, State>
       stateEditor : EStateEditor.RESIZE,
       moveShape : true,
       gizmoSelected:undefined,
-      shapeSelected : undefined
+      shapeSelected : undefined,
+      sizeViewport : {width:0, height:0}
     };
   }
 
@@ -155,6 +158,16 @@ class ContainerSVG extends React.Component<Props, State>
     this.setState({moveShape : false});
   }
 
+  public override componentDidMount()
+  {
+    this.setState({sizeViewport : {width : window.innerWidth, height : window.innerHeight}});
+  }
+
+  public override componentDidUpdate()
+  {
+    //this.setState({sizeViewport : {width : window.innerWidth, height : window.innerHeight}});
+  }
+
   protected renderShape = (shape:ShapeData, index:number) =>
   {
     let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
@@ -172,7 +185,10 @@ class ContainerSVG extends React.Component<Props, State>
         shapeSVG = <circle r={(shape.width + shape.height) / 4} fill={shape.fill}/>
         break;
       case 'text':
-        shapeSVG = <text fill={shape.fill}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </text>
+        shapeSVG = <g>
+          <rect width={shape.width} height={shape.height} fill={shape.fill}/>
+          <text fill={'green'}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </text>
+        </g>;
         break;
       case 'line':
         shapeSVG = <line x1={shape.x} y1={shape.y} x2={shape.x+shape.width} y2={shape.y+shape.height} fill={shape.fill} strokeWidth='2' stroke='red'/>
@@ -193,13 +209,18 @@ class ContainerSVG extends React.Component<Props, State>
 
   public render()
   {
+    let sizeSnap = 100;
+    let countX = Math.ceil(this.state.sizeViewport.width / sizeSnap);
+    let countY = Math.ceil(this.state.sizeViewport.height / sizeSnap);
+
     return <svg
       style={{background : 'grey'}}
       onMouseDown={this.startDrag}
       onMouseMove={this.drag}
       onMouseUp={this.endDrag}
       onMouseLeave={this.endDrag}
-      width={'100vw'} height={'100vh'}>
+      width={this.state.sizeViewport.width} height={this.state.sizeViewport.height}>
+        <GridSnapping sizeSnap={sizeSnap} countX={countX} countY={countY} />
         { this.props.children }
         { this.props.shapes.map(this.renderShape) }
       </svg>
