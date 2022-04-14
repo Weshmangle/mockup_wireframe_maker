@@ -54,7 +54,7 @@ class Toolbar extends React.Component<Props, State>
             else
             {
                 iconType = 'solid';
-                this.state.menuActivate.push(menu);   
+                this.setState({menuActivate : this.state.menuActivate.concat(menu)});
             }
         }
 

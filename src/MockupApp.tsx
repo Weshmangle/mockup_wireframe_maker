@@ -54,8 +54,7 @@ class MockupApp extends React.Component<Props, State>
         shapeFocus = shapeFocus ? shapeFocus : this.lastShape();
         shapeFocus = shapeFocus ? shapeFocus : {x:0, y:0};
         let shape:ShapeData = {id:Date.now(), x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#ff5555'};
-        this.state.shapes.push(shape);
-        this.setState({shapeSelected : shape});
+        this.setState({shapeSelected : shape, shapes : this.state.shapes.concat(shape)});
     }
 
     public addSnapping = (type:string) =>
