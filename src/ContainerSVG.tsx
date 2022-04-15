@@ -3,6 +3,7 @@ import './App.css';
 import { EStateEditor } from './EStateEditor';
 import Gizmos from './Gizmos';
 import GridSnapping from './GridSnapping';
+import MockupApp from './MockupApp';
 
 interface Props
 {
@@ -127,7 +128,7 @@ class ContainerSVG extends React.Component<Props, State>
     {
       if(this.props.snapGrid)
       {
-        let snapFactor = 100;  
+        let snapFactor = MockupApp.SIZE_SUBDIVISION_GRID;  
         shape.x = Math.floor((coord.x - this.state.offset.x)/snapFactor) * snapFactor;
         shape.y = Math.floor((coord.y - this.state.offset.y)/snapFactor) * snapFactor;
       }
@@ -161,18 +162,19 @@ class ContainerSVG extends React.Component<Props, State>
   public override componentDidMount()
   {
     this.setState({sizeViewport : {width : window.innerWidth, height : window.innerHeight}});
+    window.onresize = () => this.setState({sizeViewport : {width : window.innerWidth, height : window.innerHeight}});
   }
 
-  public override componentDidUpdate()
+  public override componentWillUnmount()
   {
-    //this.setState({sizeViewport : {width : window.innerWidth, height : window.innerHeight}});
+    window.onresize = null;
   }
 
   protected renderShape = (shape:ShapeData, index:number) =>
   {
     let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
     
-    let visible = this.props.shapeSelected?.id == shape.id;
+    let visible = this.props.shapeSelected?.id == shape.id; 
 
     let shapeSVG;
 
@@ -209,7 +211,7 @@ class ContainerSVG extends React.Component<Props, State>
 
   public render()
   {
-    let sizeSnap = 100;
+    let sizeSnap = MockupApp.SIZE_SUBDIVISION_GRID;
     let countX = Math.ceil(this.state.sizeViewport.width / sizeSnap);
     let countY = Math.ceil(this.state.sizeViewport.height / sizeSnap);
 

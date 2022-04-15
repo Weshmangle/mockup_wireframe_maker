@@ -18,6 +18,8 @@ interface Props { }
 
 class MockupApp extends React.Component<Props, State>
 {
+    public static readonly SIZE_SUBDIVISION_GRID:number = 50;
+    
     constructor(props:any)
     {
         super(props);
