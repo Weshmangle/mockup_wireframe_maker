@@ -26,7 +26,7 @@ class Gizmos extends React.Component<Props, State>
 
         return <circle
         id-gizmo={gizmos.x + ',' + gizmos.y}
-        transform={`translate(${gizmos.x * width/2} ${gizmos.y * height/2})`}
+        transform={`translate(${ width/2 * (gizmos.x + 1) } ${height/2 * (gizmos.y + 1)})`}
         key={index}
         r={5}
         fill='red'/>;

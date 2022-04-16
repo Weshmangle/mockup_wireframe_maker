@@ -150,7 +150,31 @@ class ContainerSVG extends React.Component<Props, State>
 
       let currentShape = this.state.shapeSelected;
       if(currentShape)
-        this.props.onResize({width:currentShape?.width + (position.x - this.props.shapeSelected.x)*this.state.gizmoSelected.x, height: currentShape.height + (position.y - this.props.shapeSelected.y)**this.state.gizmoSelected.y})
+      {
+        /*
+          x = 1
+          width = Mouse.x - shape.x
+          translate(x,y)
+
+          x = 0 
+          width = width
+
+          x = -1 
+          width = shape.x - Mouse.x  + width
+          translate(Mouse.x, y)
+        
+        */
+        let shape = this.props.shapeSelected;
+        let gizmo:{x:number, y:number} = this.state.gizmoSelected;
+        let width = gizmo.x == 0 ? shape.width : gizmo.x == 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
+        let height = gizmo.y == 0 ? shape.height : gizmo.y == 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
+        
+        //this.props.onResize({width:currentShape?.width + (position.x - shape.x) * gizmo.x, height: currentShape.height + (position.y - shape.y) * gizmo.y})
+        shape.x = gizmo.x == -1 ? coord.x : shape.x;
+        shape.y = gizmo.y == -1 ? coord.y: shape.y;
+
+        this.props.onResize({width:width, height: height})
+      }
     } 
   }
   
@@ -181,10 +205,11 @@ class ContainerSVG extends React.Component<Props, State>
     switch(shape.type)
     {
       case 'rect':
-        shapeSVG = <rect x={-shape.width/2} y={-shape.height/2} width={shape.width} height={shape.height} fill={shape.fill}/>;
+        //x={-shape.width/2} y={-shape.height/2}
+        shapeSVG = <rect width={shape.width} height={shape.height} fill={shape.fill}/>;
         break;
       case 'circle':
-        shapeSVG = <circle r={(shape.width + shape.height) / 4} fill={shape.fill}/>
+        shapeSVG = <circle cx={shape.width/2} cy={shape.height/2} r={(shape.width + shape.height) / 4} fill={shape.fill}/>
         break;
       case 'text':
         shapeSVG = <g>
