@@ -246,7 +246,7 @@ class ContainerSVG extends React.Component<Props, State>
       onMouseUp={this.endDrag}
       onMouseLeave={this.endDrag}
       width={this.state.sizeViewport.width} height={this.state.sizeViewport.height}>
-        <GridSnapping sizeSnap={sizeSnap} countX={countX} countY={countY} />
+        <GridSnapping visible={!this.props.snapGrid} sizeSnap={sizeSnap} countX={countX} countY={countY} />
         { this.props.children }
         { this.props.shapes.map(this.renderShape) }
       </svg>

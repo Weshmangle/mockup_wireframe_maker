@@ -5,6 +5,7 @@ interface Props
     sizeSnap:number
     countX:number,
     countY:number,
+    visible:boolean
 }
 
 export default class GridSnapping extends React.Component<Props>
@@ -41,7 +42,7 @@ export default class GridSnapping extends React.Component<Props>
     }
 
     public render()
-    {
+    {   if(this.props.visible) return ;
         return (<g>{this.linesVertical()}  {this.linesHorizontal()}</g>);
     }
 }
