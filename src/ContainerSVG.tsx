@@ -212,7 +212,7 @@ class ContainerSVG extends React.Component<Props, State>
         break;
       case 'text':
         shapeSVG = [<rect width={shape.width} height={shape.height} fill={shape.fill}/>,
-        <foreignObject width={shape.width} height={shape.height}>
+        <foreignObject width={shape.width} height={shape.height} shape-id={shape.id}>
           <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
         </foreignObject>]
         break;
