@@ -31,7 +31,7 @@ class MockupApp extends React.Component<Props, State>
                 {id:Date.now(), x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
             ],
             snapGrid : false,
-            color : undefined,
+            color : {r:'', g:'', b:''},
             showPickerColor : false
         };
     }
@@ -92,10 +92,10 @@ class MockupApp extends React.Component<Props, State>
     {
         if(this.state.shapeSelected != undefined)
         {
-            this.state.shapeSelected.fill = color.hex;
+            this.state.shapeSelected.fill = color.hex + (color.rgb.a ? Math.floor(color.rgb.a * 255).toString(16) : '00');
         }
 
-        this.setState({color : color});
+        this.setState({color : color.rgb});
     }
 
     protected showPickerColor = () =>
@@ -125,7 +125,7 @@ class MockupApp extends React.Component<Props, State>
         return (
         <div>
             <div style={{position : 'absolute', right:'0', visibility:this.state.showPickerColor ? 'visible' : 'hidden'}}>
-                <SketchPicker onChange={(color:any) => this.setState({color : color.hex})} onChangeComplete={this.setColorShapeSelected} color={this.state.color}/>
+                <SketchPicker onChange={(color:any) => this.setState({color : color.rgb})} onChangeComplete={this.setColorShapeSelected} color={this.state.color}/>
             </div>
             <ContainerSVG
                 shapes={this.state.shapes}
