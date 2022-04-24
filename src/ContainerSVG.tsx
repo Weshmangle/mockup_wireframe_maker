@@ -205,17 +205,16 @@ class ContainerSVG extends React.Component<Props, State>
     switch(shape.type)
     {
       case 'rect':
-        //x={-shape.width/2} y={-shape.height/2}
         shapeSVG = <rect width={shape.width} height={shape.height} fill={shape.fill}/>;
         break;
       case 'circle':
         shapeSVG = <circle cx={shape.width/2} cy={shape.height/2} r={(shape.width + shape.height) / 4} fill={shape.fill}/>
         break;
       case 'text':
-        shapeSVG = <g>
-          <rect width={shape.width} height={shape.height} fill={shape.fill}/>
-          <text fill={'green'}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </text>
-        </g>;
+        shapeSVG = [<rect width={shape.width} height={shape.height} fill={shape.fill}/>,
+        <foreignObject width={shape.width} height={shape.height}>
+          <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
+        </foreignObject>]
         break;
       case 'line':
         shapeSVG = <line x1={shape.x} y1={shape.y} x2={shape.x+shape.width} y2={shape.y+shape.height} fill={shape.fill} strokeWidth='2' stroke='red'/>
