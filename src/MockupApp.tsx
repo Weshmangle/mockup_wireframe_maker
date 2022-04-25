@@ -1,9 +1,7 @@
 import React from "react";
 import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
-import { SketchPicker, ColorResult, ColorChangeHandler } from 'react-color';
-import { EStateEditor } from "./EStateEditor";
-import GridSnapping from "./GridSnapping";
+import { SketchPicker, ColorResult } from 'react-color';
 
 interface State
 {
@@ -70,9 +68,9 @@ class MockupApp extends React.Component<Props, State>
         let shapes = this.state.shapes;
         let shape = this.state.shapeSelected;
         
-        if(shape != undefined)
+        if(shape !== undefined)
         {
-            let newShapes = shapes.filter(menu => menu.id != shape?.id);
+            let newShapes = shapes.filter(menu => menu.id !== shape?.id);
             
             this.setState({shapeSelected : newShapes[newShapes.length - 1], shapes : newShapes});
         }
@@ -90,9 +88,11 @@ class MockupApp extends React.Component<Props, State>
 
     public setColorShapeSelected = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) =>
     {
-        if(this.state.shapeSelected != undefined)
+        if(this.state.shapeSelected !== undefined)
         {
-            this.state.shapeSelected.fill = color.hex + (color.rgb.a ? Math.floor(color.rgb.a * 255).toString(16) : '00');
+            let shape:ShapeData = this.state.shapeSelected;
+            shape.fill = color.hex + (color.rgb.a ? Math.floor(color.rgb.a * 255).toString(16) : '00');
+            this.setState({shapeSelected : shape});
         }
 
         this.setState({color : color.rgb});
@@ -136,8 +136,11 @@ class MockupApp extends React.Component<Props, State>
                 onResize={e => {
                     if(this.state.shapeSelected)
                     {
-                        this.state.shapeSelected.height = Math.abs(e.height);
-                        this.state.shapeSelected.width = Math.abs(e.width);
+                        let shape:ShapeData = this.state.shapeSelected;
+                        
+                        shape.height = Math.abs(e.height);
+                        shape.width = Math.abs(e.width);
+                        this.setState({shapeSelected : shape});
                     }
                 }}/>
             <Toolbar menu={menu}/>

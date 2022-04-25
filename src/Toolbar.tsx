@@ -31,28 +31,24 @@ class Toolbar extends React.Component<Props, State>
 
     protected menuIsActivate(menu:Menu)
     {
-        let menuFinded = this.state.menuActivate.find(m => m.id == menu.id)
-        return menuFinded != undefined;
+        let menuFinded = this.state.menuActivate.find(m => m.id === menu.id)
+        return menuFinded !== undefined;
     }
 
     public clickMenu(menu:Menu)
     {
         let event = menu.event ? menu.event : (type:string) => {console.error("[ CORE ] NO EVENT ADDED")};
         
-        let iconType = 'regular';
-
         if(menu.toggle)
         {
-            let menus = this.state.menuActivate.filter(menuItem => menuItem.id == menu.id);
+            let menus = this.state.menuActivate.filter(menuItem => menuItem.id === menu.id);
 
             if(menus.length > 0)
             {
-                iconType = 'regular';
-                this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id != menu.id)});
+                this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id !== menu.id)});
             }
             else
             {
-                iconType = 'solid';
                 this.setState({menuActivate : this.state.menuActivate.concat(menu)});
             }
         }

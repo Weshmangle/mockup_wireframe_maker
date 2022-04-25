@@ -10,11 +10,6 @@ interface Props
 
 export default class GridSnapping extends React.Component<Props>
 {
-    constructor(parameters:any)
-    {
-        super(parameters);
-    }
-
     protected linesVertical = () =>
     {
         let lines:any[] = Array(this.props.countX).fill(undefined);

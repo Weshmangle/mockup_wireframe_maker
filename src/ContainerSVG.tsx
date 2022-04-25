@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 import './App.css';
 import { EStateEditor } from './EStateEditor';
 import Gizmos from './Gizmos';
@@ -64,7 +64,7 @@ class ContainerSVG extends React.Component<Props, State>
   protected getShape(event:React.MouseEvent) : ShapeData | undefined
   {
     let id = ((event.target as SVGElement)?.parentNode as SVGElement)?.getAttribute('shape-id');
-    let shapes = this.props.shapes.filter(shape => shape.id == Number(id));
+    let shapes = this.props.shapes.filter(shape => shape.id === Number(id));
     return id ? shapes[0] : undefined;
   }
 
@@ -72,7 +72,7 @@ class ContainerSVG extends React.Component<Props, State>
   {
     let idGizmo = (event.target as SVGElement)?.getAttribute('id-gizmo');
     let control = idGizmo?.split(',');
-    return control && control.length == 2 ? {x:Number(control[0]), y:Number(control[1])} : undefined;
+    return control && control.length === 2 ? {x:Number(control[0]), y:Number(control[1])} : undefined;
   }
 
   protected startDrag = (event:React.MouseEvent) =>
@@ -146,7 +146,7 @@ class ContainerSVG extends React.Component<Props, State>
     
     if(coord && this.props.shapeSelected)
     {
-      let position = {x: coord.x - this.state.offset.x, y: coord.y - this.state.offset.y};
+      //let position = {x: coord.x - this.state.offset.x, y: coord.y - this.state.offset.y};
 
       let currentShape = this.state.shapeSelected;
       if(currentShape)
@@ -166,12 +166,12 @@ class ContainerSVG extends React.Component<Props, State>
         */
         let shape = this.props.shapeSelected;
         let gizmo:{x:number, y:number} = this.state.gizmoSelected;
-        let width = gizmo.x == 0 ? shape.width : gizmo.x == 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
-        let height = gizmo.y == 0 ? shape.height : gizmo.y == 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
+        let width = gizmo.x === 0 ? shape.width : gizmo.x === 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
+        let height = gizmo.y === 0 ? shape.height : gizmo.y === 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
         
         //this.props.onResize({width:currentShape?.width + (position.x - shape.x) * gizmo.x, height: currentShape.height + (position.y - shape.y) * gizmo.y})
-        shape.x = gizmo.x == -1 ? coord.x : shape.x;
-        shape.y = gizmo.y == -1 ? coord.y: shape.y;
+        shape.x = gizmo.x === -1 ? coord.x : shape.x;
+        shape.y = gizmo.y === -1 ? coord.y: shape.y;
 
         this.props.onResize({width:width, height: height})
       }
@@ -196,9 +196,9 @@ class ContainerSVG extends React.Component<Props, State>
 
   protected renderShape = (shape:ShapeData, index:number) =>
   {
-    let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
+    //let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
     
-    let visible = this.props.shapeSelected?.id == shape.id; 
+    let visible = this.props.shapeSelected?.id === shape.id; 
 
     let shapeSVG;
 
