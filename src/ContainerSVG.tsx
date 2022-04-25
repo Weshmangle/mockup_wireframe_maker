@@ -146,32 +146,25 @@ class ContainerSVG extends React.Component<Props, State>
     
     if(coord && this.props.shapeSelected)
     {
-      //let position = {x: coord.x - this.state.offset.x, y: coord.y - this.state.offset.y};
-
       let currentShape = this.state.shapeSelected;
       if(currentShape)
       {
-        /*
-          x = 1
-          width = Mouse.x - shape.x
-          translate(x,y)
-
-          x = 0 
-          width = width
-
-          x = -1 
-          width = shape.x - Mouse.x  + width
-          translate(Mouse.x, y)
-        
-        */
         let shape = this.props.shapeSelected;
         let gizmo:{x:number, y:number} = this.state.gizmoSelected;
         let width = gizmo.x === 0 ? shape.width : gizmo.x === 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
         let height = gizmo.y === 0 ? shape.height : gizmo.y === 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
         
-        //this.props.onResize({width:currentShape?.width + (position.x - shape.x) * gizmo.x, height: currentShape.height + (position.y - shape.y) * gizmo.y})
         shape.x = gizmo.x === -1 ? coord.x : shape.x;
         shape.y = gizmo.y === -1 ? coord.y: shape.y;
+
+        /*if(this.props.snapGrid)
+        {
+          let snapFactor = MockupApp.SIZE_SUBDIVISION_GRID;  
+          shape.x = Math.floor(shape.x/snapFactor) * snapFactor;
+          shape.y = Math.floor(shape.y/snapFactor) * snapFactor;
+          width = Math.floor(width/snapFactor) * snapFactor;
+          height = Math.floor(height/snapFactor) * snapFactor;
+        }*/
 
         this.props.onResize({width:width, height: height})
       }
@@ -211,9 +204,9 @@ class ContainerSVG extends React.Component<Props, State>
         shapeSVG = <circle cx={shape.width/2} cy={shape.height/2} r={(shape.width + shape.height) / 4} fill={shape.fill}/>
         break;
       case 'text':
-        shapeSVG = [<rect width={shape.width} height={shape.height} fill={shape.fill}/>,
+        shapeSVG = [<rect width={shape.width} height={shape.height} opacity='0'/>,
         <foreignObject width={shape.width} height={shape.height} shape-id={shape.id}>
-          <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
+          <p style={{userSelect : 'none', color : shape.fill}}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
         </foreignObject>]
         break;
       case 'line':
@@ -240,15 +233,15 @@ class ContainerSVG extends React.Component<Props, State>
     let countY = Math.ceil(this.state.sizeViewport.height / sizeSnap);
 
     return <svg
-      style={{background : 'grey'}}
+      style={{background : '#667292'}}
       onMouseDown={this.startDrag}
       onMouseMove={this.drag}
       onMouseUp={this.endDrag}
       onMouseLeave={this.endDrag}
       width={this.state.sizeViewport.width} height={this.state.sizeViewport.height}>
-        <GridSnapping visible={!this.props.snapGrid} sizeSnap={sizeSnap} countX={countX} countY={countY} />
         { this.props.children }
         { this.props.shapes.map(this.renderShape) }
+        <GridSnapping visible={!this.props.snapGrid} sizeSnap={sizeSnap} countX={countX} countY={countY} />
       </svg>
   }
 }

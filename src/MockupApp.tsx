@@ -2,6 +2,7 @@ import React from "react";
 import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
 import { SketchPicker, ColorResult } from 'react-color';
+import { PresetColor } from "react-color/lib/components/sketch/Sketch";
 
 interface State
 {
@@ -9,7 +10,8 @@ interface State
     shapeSelected : ShapeData | undefined;
     moveShape: boolean,
     snapGrid:boolean,
-    color:any,
+    currentColorPicker:any,
+    presetColors:PresetColor[],
     showPickerColor:boolean
 }
 interface Props { }
@@ -26,10 +28,11 @@ class MockupApp extends React.Component<Props, State>
             moveShape : false,
             shapes :
             [          
-                {id:Date.now(), x:10, y:20, width:100, height:30, type: 'rect', fill:'#abcdef'},
+                {id:Date.now(), x:10, y:20, width:100, height:30, type: 'rect', fill:'#8d9db6'},
             ],
             snapGrid : false,
-            color : {r:'', g:'', b:''},
+            currentColorPicker : {r:'', g:'', b:''},
+            presetColors : [],
             showPickerColor : false
         };
     }
@@ -54,7 +57,7 @@ class MockupApp extends React.Component<Props, State>
         let shapeFocus:any = this.state.shapeSelected;
         shapeFocus = shapeFocus ? shapeFocus : this.lastShape();
         shapeFocus = shapeFocus ? shapeFocus : {x:0, y:0};
-        let shape:ShapeData = {id:Date.now(), x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#ff5555'};
+        let shape:ShapeData = {id:Date.now(), x:shapeFocus.x + 25, y:shapeFocus.y + 25, width:50, height:50, type: type, fill:'#8d9db6'};
         this.setState({shapeSelected : shape, shapes : this.state.shapes.concat(shape)});
     }
 
@@ -93,9 +96,24 @@ class MockupApp extends React.Component<Props, State>
             let shape:ShapeData = this.state.shapeSelected;
             shape.fill = color.hex + (color.rgb.a ? Math.floor(color.rgb.a * 255).toString(16) : '00');
             this.setState({shapeSelected : shape});
+            this.addColorToPresetColor(shape.fill, shape.id);
         }
 
-        this.setState({color : color.rgb});
+        this.setState({currentColorPicker : color.rgb});
+    }
+
+    public addColorToPresetColor(color:string, id:number)
+    {
+        let colors = this.state.presetColors;
+        
+        let indexColorFinded = colors.findIndex((color:any) => color.title == 'color ' + id);
+        
+        if(indexColorFinded >= 0)
+        {
+            colors. splice(indexColorFinded, 1);
+        }
+
+        this.setState({presetColors : colors.concat({color : color, title : 'color ' + id})});
     }
 
     protected showPickerColor = () =>
@@ -125,7 +143,7 @@ class MockupApp extends React.Component<Props, State>
         return (
         <div>
             <div style={{position : 'absolute', right:'0', visibility:this.state.showPickerColor ? 'visible' : 'hidden'}}>
-                <SketchPicker onChange={(color:any) => this.setState({color : color.rgb})} onChangeComplete={this.setColorShapeSelected} color={this.state.color}/>
+                <SketchPicker presetColors={this.state.presetColors} onChange={this.setColorShapeSelected} onChangeComplete={this.setColorShapeSelected} color={this.state.currentColorPicker}/>
             </div>
             <ContainerSVG
                 shapes={this.state.shapes}
