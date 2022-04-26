@@ -109,7 +109,6 @@ class MockupApp extends React.Component<Props, State>
         [
             {id:'0', name : 'Create Rect', type:'rect', iconFontAwesome:'fa-square', event : this.addShape},
             {id:'1', name : 'Create Circle', type:'circle', iconFontAwesome:'fa-circle', event : this.addShape},
-            //{id:'2', name : 'Create Slash', type:'line', iconFontAwesome:'fa-slash', event : this.addShape},
             {id:'3', name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height', event : this.addShape},
             {id:'4', name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can', event : this.removeShapeSelected},
             {
@@ -130,7 +129,6 @@ class MockupApp extends React.Component<Props, State>
             <ContainerSVG
                 shapes={this.state.shapes}
                 shapeSelected={this.state.shapeSelected}
-                //moveShape={this.state.moveShape}
                 snapGrid={this.state.snapGrid}
                 onSelectShape={this.selectShape}
                 onResize={e => {
@@ -140,7 +138,7 @@ class MockupApp extends React.Component<Props, State>
                         this.state.shapeSelected.width = Math.abs(e.width);
                     }
                 }}/>
-            <Toolbar menu={menu}/>
+            <Toolbar menu={menu} sliderVisible={false}/>
         </div>);
     }
 }

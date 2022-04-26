@@ -13,12 +13,14 @@ export interface Menu
 
 interface Props
 {
-    menu : Menu[]
+    menu : Menu[],
+    sliderVisible?:boolean
 }
  
 interface State
 {
-    menuActivate : Menu[]
+    menuActivate : Menu[],
+    valueSlider: number
 }
 
 class Toolbar extends React.Component<Props, State>
@@ -26,7 +28,7 @@ class Toolbar extends React.Component<Props, State>
     constructor(props: Props)
     {
         super(props);
-        this.state = { menuActivate : []};
+        this.state = { menuActivate : [], valueSlider : 50};
     }
 
     protected menuIsActivate(menu:Menu)
@@ -73,16 +75,28 @@ class Toolbar extends React.Component<Props, State>
         );
     }
 
+    public sliderChange = (event:any) =>
+    {
+        this.setState({valueSlider : Number(event.target.value)});
+    }
+
     public render()
     {
-        return(
-        <nav className="navbar navbar-expand-sm fixed-bottom navbar-dark bg-dark justify-content-center">
-          <div className="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul className="navbar-nav">
-            {this.props.menu.map(this.renderMenu)}
-            </ul>
-          </div>
-        </nav>);
+        return(<div>
+                <div className="container-fluid" style={{position : 'absolute', bottom : '65px', visibility : this.props.sliderVisible ? 'visible' : 'hidden'}}>
+                    <div className="row bg-secondary p-3">
+                        <div className='col-11'> <input value={this.state.valueSlider} type='range' onInput={this.sliderChange} className='form-range' /> </div>
+                        <div className='col-1 text-dark text-center'> {this.state.valueSlider} </div>
+                    </div> 
+                </div>
+                <nav className="navbar navbar-expand-sm fixed-bottom navbar-dark bg-dark justify-content-center">
+                <div className="collapse navbar-collapse" id="collapsibleNavbar">
+                    <ul className="navbar-nav">
+                    {this.props.menu.map(this.renderMenu)}
+                    </ul>
+                </div>
+                </nav>
+                </div>);
     }
 }
  
