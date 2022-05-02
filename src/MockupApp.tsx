@@ -1,9 +1,7 @@
 import React from "react";
 import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
-import { SketchPicker, ColorResult, ColorChangeHandler } from 'react-color';
-import { EStateEditor } from "./EStateEditor";
-import GridSnapping from "./GridSnapping";
+import { SketchPicker, ColorResult } from 'react-color';
 
 interface State
 {
@@ -12,7 +10,8 @@ interface State
     moveShape: boolean,
     snapGrid:boolean,
     color:any,
-    showPickerColor:boolean
+    showPickerColor:boolean,
+    showSlider:boolean,
 }
 interface Props { }
 
@@ -32,7 +31,8 @@ class MockupApp extends React.Component<Props, State>
             ],
             snapGrid : false,
             color : {r:'', g:'', b:''},
-            showPickerColor : false
+            showPickerColor : false,
+            showSlider : false
         };
     }
 
@@ -70,9 +70,9 @@ class MockupApp extends React.Component<Props, State>
         let shapes = this.state.shapes;
         let shape = this.state.shapeSelected;
         
-        if(shape != undefined)
+        if(shape !== undefined)
         {
-            let newShapes = shapes.filter(menu => menu.id != shape?.id);
+            let newShapes = shapes.filter(menu => menu.id !== shape?.id);
             
             this.setState({shapeSelected : newShapes[newShapes.length - 1], shapes : newShapes});
         }
@@ -90,7 +90,7 @@ class MockupApp extends React.Component<Props, State>
 
     public setColorShapeSelected = (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) =>
     {
-        if(this.state.shapeSelected != undefined)
+        if(this.state.shapeSelected !== undefined)
         {
             this.state.shapeSelected.fill = color.hex + (color.rgb.a ? Math.floor(color.rgb.a * 255).toString(16) : '00');
         }
@@ -103,6 +103,11 @@ class MockupApp extends React.Component<Props, State>
         this.setState({showPickerColor : !this.state.showPickerColor})
     }
 
+    protected showStrokeEdit()
+    {
+        this.setState({showSlider : !this.state.showSlider})
+    }
+
     public render()
     {
         let menu:Menu[] = 
@@ -112,13 +117,14 @@ class MockupApp extends React.Component<Props, State>
             {id:'3', name : 'Create Text', type:'text', iconFontAwesome:'fa-text-height', event : this.addShape},
             {id:'4', name : 'Remove shape', type:'remove', iconFontAwesome:'fa-trash-can', event : this.removeShapeSelected},
             {
-                id:'5', name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', event: () => this.showPickerColor(), subMenu:
+                id:'5', name : 'Option Color', type:'color', iconFontAwesome:'fa-palette', event: this.showPickerColor, subMenu:
                 [
                     {id:'5.1', name : 'Fill Color', type:'color', iconFontAwesome:'fa-palette'},
                     {id:'5.2', name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
                 ]
             },
-            {id:'6', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-compass', toggle : true, event : this.addSnapping},
+            {id:'6', name : 'Stroke', type:'stroke', iconFontAwesome:'fa-dash', toggle : true, event : this.addSnapping},
+            {id:'7', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-compass', toggle : true, event : this.addSnapping},
         ];
         
         return (
@@ -138,7 +144,7 @@ class MockupApp extends React.Component<Props, State>
                         this.state.shapeSelected.width = Math.abs(e.width);
                     }
                 }}/>
-            <Toolbar menu={menu} sliderVisible={false}/>
+            <Toolbar menu={menu} sliderVisible={this.state.showSlider}/>
         </div>);
     }
 }

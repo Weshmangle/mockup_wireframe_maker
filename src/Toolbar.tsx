@@ -1,4 +1,5 @@
 import React from "react";
+import ToolBarAction from "./ToolBarAction";
 
 export interface Menu
 {
@@ -33,28 +34,24 @@ class Toolbar extends React.Component<Props, State>
 
     protected menuIsActivate(menu:Menu)
     {
-        let menuFinded = this.state.menuActivate.find(m => m.id == menu.id)
-        return menuFinded != undefined;
+        let menuFinded = this.state.menuActivate.find(m => m.id === menu.id)
+        return menuFinded !== undefined;
     }
 
     public clickMenu(menu:Menu)
     {
         let event = menu.event ? menu.event : (type:string) => {console.error("[ CORE ] NO EVENT ADDED")};
-        
-        let iconType = 'regular';
 
         if(menu.toggle)
         {
-            let menus = this.state.menuActivate.filter(menuItem => menuItem.id == menu.id);
-
+            let menus = this.state.menuActivate.filter(menuItem => menuItem.id === menu.id);
+            
             if(menus.length > 0)
             {
-                iconType = 'regular';
-                this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id != menu.id)});
+                this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id !== menu.id)});
             }
             else
             {
-                iconType = 'solid';
                 this.setState({menuActivate : this.state.menuActivate.concat(menu)});
             }
         }
@@ -82,6 +79,8 @@ class Toolbar extends React.Component<Props, State>
 
     public render()
     {
+        //
+        //
         return(<div>
                 <div className="container-fluid" style={{position : 'absolute', bottom : '65px', visibility : this.props.sliderVisible ? 'visible' : 'hidden'}}>
                     <div className="row bg-secondary p-3">
@@ -93,6 +92,7 @@ class Toolbar extends React.Component<Props, State>
                 <div className="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul className="navbar-nav">
                     {this.props.menu.map(this.renderMenu)}
+                    {this.props.menu.map((value, index) => <ToolBarAction menu={value} key={index} active={false}/>)}
                     </ul>
                 </div>
                 </nav>
