@@ -41,11 +41,11 @@ class Toolbar extends React.Component<Props, State>
     public clickMenu(menu:Menu)
     {
         let event = menu.event ? menu.event : (type:string) => {console.error("[ CORE ] NO EVENT ADDED")};
-
+        
         if(menu.toggle)
         {
             let menus = this.state.menuActivate.filter(menuItem => menuItem.id === menu.id);
-            
+
             if(menus.length > 0)
             {
                 this.setState({menuActivate : this.state.menuActivate.filter(menuItem => menuItem.id !== menu.id)});

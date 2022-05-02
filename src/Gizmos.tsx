@@ -29,7 +29,7 @@ class Gizmos extends React.Component<Props, State>
         transform={`translate(${ width/2 * (gizmos.x + 1) } ${height/2 * (gizmos.y + 1)})`}
         key={index}
         r={5}
-        fill='red'/>;
+        fill='#f1e3dd'/>;
     }
     
     public render()

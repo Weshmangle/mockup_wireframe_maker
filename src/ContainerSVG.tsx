@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 import './App.css';
 import { EStateEditor } from './EStateEditor';
 import Gizmos from './Gizmos';
@@ -64,7 +64,7 @@ class ContainerSVG extends React.Component<Props, State>
   protected getShape(event:React.MouseEvent) : ShapeData | undefined
   {
     let id = ((event.target as SVGElement)?.parentNode as SVGElement)?.getAttribute('shape-id');
-    let shapes = this.props.shapes.filter(shape => shape.id == Number(id));
+    let shapes = this.props.shapes.filter(shape => shape.id === Number(id));
     return id ? shapes[0] : undefined;
   }
 
@@ -72,7 +72,7 @@ class ContainerSVG extends React.Component<Props, State>
   {
     let idGizmo = (event.target as SVGElement)?.getAttribute('id-gizmo');
     let control = idGizmo?.split(',');
-    return control && control.length == 2 ? {x:Number(control[0]), y:Number(control[1])} : undefined;
+    return control && control.length === 2 ? {x:Number(control[0]), y:Number(control[1])} : undefined;
   }
 
   protected startDrag = (event:React.MouseEvent) =>
@@ -146,15 +146,13 @@ class ContainerSVG extends React.Component<Props, State>
     
     if(coord && this.props.shapeSelected)
     {
-      let position = {x: coord.x - this.state.offset.x, y: coord.y - this.state.offset.y};
-
       let currentShape = this.state.shapeSelected;
       if(currentShape)
       {
         let shape = this.props.shapeSelected;
         let gizmo:{x:number, y:number} = this.state.gizmoSelected;
-        let width = gizmo.x == 0 ? shape.width : gizmo.x == 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
-        let height = gizmo.y == 0 ? shape.height : gizmo.y == 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
+        let width = gizmo.x === 0 ? shape.width : gizmo.x === 1 ? coord.x - shape.x : shape.x - coord.x + shape.width;
+        let height = gizmo.y === 0 ? shape.height : gizmo.y === 1 ? coord.y - shape.y : shape.y - coord.y + shape.height;
         
         shape.x = gizmo.x == -1 ? coord.x : shape.x;
         shape.y = gizmo.y == -1 ? coord.y: shape.y;
@@ -182,9 +180,9 @@ class ContainerSVG extends React.Component<Props, State>
 
   protected renderShape = (shape:ShapeData, index:number) =>
   {
-    let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
+    //let stroke = shape == this.props.shapeSelected ? {strokeDasharray:"10", stroke : 'black', strokeWidth : '10px', strokeOpacity : '.5'} : undefined;
     
-    let visible = this.props.shapeSelected?.id == shape.id; 
+    let visible = this.props.shapeSelected?.id === shape.id; 
 
     let shapeSVG;
 
@@ -197,9 +195,9 @@ class ContainerSVG extends React.Component<Props, State>
         shapeSVG = <circle cx={shape.width/2} cy={shape.height/2} r={(shape.width + shape.height) / 4} fill={shape.fill}/>
         break;
       case 'text':
-        shapeSVG = [<rect width={shape.width} height={shape.height} fill={shape.fill}/>,
+        shapeSVG = [<rect width={shape.width} height={shape.height} opacity='0'/>,
         <foreignObject width={shape.width} height={shape.height} shape-id={shape.id}>
-          <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
+          <p style={{userSelect : 'none', color : shape.fill}}> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </p>
         </foreignObject>]
         break;
       case 'line':
@@ -226,15 +224,15 @@ class ContainerSVG extends React.Component<Props, State>
     let countY = Math.ceil(this.state.sizeViewport.height / sizeSnap);
 
     return <svg
-      style={{background : 'grey'}}
+      style={{background : '#667292'}}
       onMouseDown={this.startDrag}
       onMouseMove={this.drag}
       onMouseUp={this.endDrag}
       onMouseLeave={this.endDrag}
       width={this.state.sizeViewport.width} height={this.state.sizeViewport.height}>
-        <GridSnapping visible={!this.props.snapGrid} sizeSnap={sizeSnap} countX={countX} countY={countY} />
         { this.props.children }
         { this.props.shapes.map(this.renderShape) }
+        <GridSnapping visible={!this.props.snapGrid} sizeSnap={sizeSnap} countX={countX} countY={countY} />
       </svg>
   }
 }
