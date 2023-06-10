@@ -40,7 +40,7 @@ export default class ToolBarAction extends React.Component<Props, State>
         
         return(
             <li className="nav-item">
-                <a className="nav-link" href="#" onClick={e => this.clickMenu()}>
+                <a className="nav-link" href="#" onClick={e => this.clickMenu()} onTouchStart={e => this.clickMenu()}>
                     <i className={`fa-${iconType} ${menu.iconFontAwesome}`} style={{fontSize : '2em'}}></i>
                 </a>
             </li>

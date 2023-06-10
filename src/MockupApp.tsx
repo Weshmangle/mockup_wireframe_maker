@@ -3,6 +3,7 @@ import ContainerSVG, { ShapeData } from "./ContainerSVG";
 import Toolbar, { Menu } from "./Toolbar";
 import { SketchPicker, ColorResult } from 'react-color';
 import { PresetColor } from "react-color/lib/components/sketch/Sketch";
+import { setTimeout } from "timers/promises";
 
 interface State
 {
@@ -145,14 +146,14 @@ class MockupApp extends React.Component<Props, State>
                     {id:'5.2', name : 'Border Color', type:'color', iconFontAwesome:'fa-palette'},
                 ]
             },
-            {id:'6', name : 'Stroke', type:'stroke', iconFontAwesome:'fa-dash', toggle : true, event : this.addSnapping},
+            {id:'6', name : 'Stroke', type:'stroke', iconFontAwesome:'fa-dash', toggle : true, event : (type:string)=>{}},
             {id:'7', name : 'Active Snapping', type:'snapping', iconFontAwesome:'fa-compass', toggle : true, event : this.addSnapping},
         ];
         
         return (
         <div>
             <div style={{position : 'absolute', right:'0', visibility:this.state.showPickerColor ? 'visible' : 'hidden'}}>
-                <SketchPicker presetColors={this.state.presetColors} onChange={this.setColorShapeSelected} onChangeComplete={this.setColorShapeSelected} color={this.state.currentColorPicker}/>
+                <SketchPicker presetColors={this.state.presetColors} onChange={this.setColorShapeSelected} onChangeComplete={()=>{this.setState({showPickerColor : false})}} color={this.state.currentColorPicker}/>
             </div>
             <ContainerSVG
                 shapes={this.state.shapes}

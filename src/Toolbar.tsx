@@ -65,7 +65,7 @@ class Toolbar extends React.Component<Props, State>
         
         return(
             <li className="nav-item" key={index}>
-                <a className="nav-link" href="#" onClick={e => this.clickMenu(menu)}>
+                <a className="nav-link" href="#" onClick={e => this.clickMenu(menu)} onTouchStart={e => this.clickMenu(menu)}>
                     <i className={`fa-${iconType} ${menu.iconFontAwesome}`} style={{fontSize : '2em'}}></i>
                 </a>
             </li>
@@ -91,12 +91,12 @@ class Toolbar extends React.Component<Props, State>
                 <nav className="navbar navbar-expand-sm fixed-bottom navbar-dark bg-dark justify-content-center">
                 <div className="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul className="navbar-nav">
-                    {this.props.menu.map(this.renderMenu)}
+                    {/*this.props.menu.map(this.renderMenu)*/}
                     {this.props.menu.map((value, index) => <ToolBarAction menu={value} key={index} active={false}/>)}
                     </ul>
                 </div>
                 </nav>
-                </div>);
+              </div>);
     }
 }
  
